@@ -1,42 +1,133 @@
 # rustlist
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+一个简单的的第三方铁锈战争列表
 
-Here are some useful links to get you started:
+## 运行
+在`releases`中下载`jar`后，在目录中直接运行`java -jar rustlist-all.jar`
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+运行后，当前目录会出现一个配置文件 `config.yml`，以下为配置信息
 
-## Features
+ - `port`运行的端口
+ - `accessToken`调用api时的验证token
+ - `staticRoomList`静态的房间列表
+ - `updatePeriod`列表更新的时间间隔(单位：毫秒)
+ - `roomTick`非静态房间最多可存在的时刻，以`updatePeriod`计算，如填5则代表经过5次`updatePeriod`时间后，该房间将会被删除
 
-Here's a list of features included in this project:
+下面是一个合法的配置文件:
+```yaml
+port: 8080
+accessToken: cSBrUerixWA7aezSfHo9f_LKJkZss2Pj5uJ_4SEoBIw
+roomTick: 5
+updatePeriod: 2000
+staticRoomList:
+  - creator: "RELAY-CN"
+    mapName: "RELAY-CN"
+    version: "1.15"
+    playerCurrentCount: 0
+    playerMaxCount: 1000
+    isUpperCase: true
+    netWorkAddress: 43.248.96.172
+    port: 5123
 
-| Name                                                       | Description                                                    |
-| ------------------------------------------------------------|---------------------------------------------------------------- |
-| [Authentication](https://start.ktor.io/p/auth)             | Provides extension point for handling the Authorization header |
-| [Routing](https://start.ktor.io/p/routing)                 | Provides a structured routing DSL                              |
-| [Default Headers](https://start.ktor.io/p/default-headers) | Adds a default set of headers to HTTP responses                |
-| [Compression](https://start.ktor.io/p/compression)         | Compresses responses using encoding algorithms like GZIP       |
+  - creator: "GameMaster"
+    mapName: "SKY FORTRESS"
+    version: "1.15"
+    playerCurrentCount: 78
+    playerMaxCount: 100
+    isUpperCase: true
 
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+  - creator: "NoobSlayer"
+    mapName: "Underground Lair"
+    version: "1.16"
+    playerCurrentCount: 42
+    playerMaxCount: 64
+    isUpperCase: false
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+
+## 使用
+原版铁锈战争并不支持切换列表，但可以使用[RWPP](https://github.com/Minxyzgo/RWPP)来读取第三方列表
+
+打开RWPP后，点击多人游戏，点击在右下的`+`
+![1](/.github/img/1.png)
+
+之后，在`Server Type`中选择`RoomList`，并填写`url`. (格式示例: http://127.0.0.1:8080/?action=list, 注意应为**http**)
+![2](/.github/img/2.png)
+
+## 静态房间列表
+`rustlist`在配置文件中添加静态房间列表，即一列**不会**随列表更新而被删除的房间
+
+可以在配置文件中用`staticRoomList`配置
+
+以下是有用的配置信息:
+
+ - `creator`房间的创建者
+ - `mapName`房间地图
+ - `version`版本号
+ - `playerCurrentCount`当前房间的玩家数量
+ - `playerMaxCount`最大玩家数量
+ - `isUpperCase`是否突出显示
+ - `netWorkAddress`网络地址
+ - `port`端口
+ - `mods`模组列表
+
+## Api
+可以利用`api`来动态添加房间
+
+注意，需要先运行jar在配置文件中获得`accessToken`后在请求中添加
+
+这是一个请求的示例:
+```js
+const response = await fetch(`http://127.0.0.1:${config.port}/api/update?isStatic=true`, {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${config.accessToken}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        uuid: "ac6d00d9-f264-4446-89c9-38e5dcd93cc8"
+    })
+});
 ```
 
+### 更新列表: post /api/update
+
+**参数：**
+ - `isStatic` 是否为静态房间
+
+**请求：**
+```json
+{
+    "uuid": "ac6d00d9-f264-4446-89c9-38e5dcd93cc8",
+    "roomOwner": "",
+    "gameVersion": 176,
+    "netWorkAddress": "",
+    "localAddress": "",
+    "port": 5123,
+    "isOpen": true,
+    "creator": "",
+    "requiredPassword": false,
+    "mapName": "",
+    "mapType": "",
+    "status": "battleroom",
+    "version": "",
+    "isLocal": false,
+    "displayMapName": "",
+    "playerCurrentCount": null,
+    "playerMaxCount": null,
+    "isUpperCase": false,
+    "uuid2": "",
+    "unknown": false,
+    "mods": ""
+}
+```
+### 维持房间: get /api/keep
+重置一个房间的tick
+
+**参数：**
+- `uuid` 房间uuid
+
+### 删除房间: get /api/remove
+删除一个在列表上的房间
+
+**参数：**
+- `uuid` 房间uuid

@@ -7,9 +7,20 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonBuilder
 import kotlin.test.Test
 
 class ApplicationTest {
+
+    @Test
+    fun testOutput() {
+        val json = Json {
+            encodeDefaults = true
+            ignoreUnknownKeys = false
+            prettyPrint = true
+        }
+        println(json.encodeToString(RoomDescription()))
+    }
 
     @Test
     fun testUpdate() {
@@ -21,7 +32,6 @@ class ApplicationTest {
                 headers {
                     append("Authorization", "Bearer ${config.accessToken}")
                 }
-
                 setBody(Json.encodeToString(RoomDescription(creator = "you")))
             }
 

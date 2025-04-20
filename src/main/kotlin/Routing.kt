@@ -7,6 +7,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.request.receiveParameters
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -38,7 +39,8 @@ fun Application.configureRouting() {
             post("/api/update") {
                 try {
                     val room = Json.decodeFromString(RoomDescription.serializer(), call.receiveText())
-                    globalRoomDataMap[room.uuid] = RoomData(room, false)
+                    val isStatic = call.receiveParameters()["isStatic"].toBoolean()
+                    globalRoomDataMap[room.uuid] = RoomData(room, isStatic)
                     log.info("Add room: ${room.uuid}")
                     call.respond(HttpStatusCode.Created)
                 } catch (_: Throwable) {
@@ -46,14 +48,14 @@ fun Application.configureRouting() {
                 }
             }
 
-            post("/api/keep") {
-                val data = globalRoomDataMap[call.parameters["uuid"]]
+            get("/api/keep") {
+                val data = globalRoomDataMap[call.queryParameters["uuid"]]
                 data?.tick = config.roomTick
                 call.respond(HttpStatusCode.OK)
             }
 
-            post("/api/remove") {
-                globalRoomDataMap.remove(call.parameters["uuid"])
+            get("/api/remove") {
+                globalRoomDataMap.remove(call.queryParameters["uuid"])
                 call.respond(HttpStatusCode.OK)
             }
         }
