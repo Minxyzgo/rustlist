@@ -5,5 +5,7 @@ class RoomData(
     val isStatic: Boolean,
 
     @Volatile
-    var tick: Int = config.roomTick
+    var tick: Int = config.roomTick,
+
+    val privateToken: String? = null
 )

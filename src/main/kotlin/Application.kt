@@ -29,6 +29,7 @@ fun readConfig() {
 }
 
 fun Application.module() {
+    configureRateLimit()
     configureSecurity()
     configureHTTP()
     configureRouting()

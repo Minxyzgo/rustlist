@@ -17,5 +17,8 @@ data class Config(
     },
     val staticRoomList: List<RoomDescription> = listOf(),
     val updatePeriod: Long = 2000,
-    val roomTick: Int = 5
+    val roomTick: Int = 5,
+    val enableClientAction: Boolean = false,
+    val selfInfoTimeout: Int = 3000,
+    val clientLimitsPerMinute: Int = 50
 )

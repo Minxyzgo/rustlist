@@ -10,7 +10,7 @@ data class RoomDescription(
     val gameVersion: Int = 176,
     val netWorkAddress: String = "",
     val localAddress: String = "",
-    val port: Long = 5123,
+    val port: Int = 5123,
     val isOpen: Boolean = true,
     val creator: String = "",
     val requiredPassword: Boolean = false,
