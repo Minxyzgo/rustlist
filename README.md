@@ -63,7 +63,7 @@ staticRoomList:
 点击`classes.dex`后，点击`Dex编辑Plus`
 ![t2](/.github/img/t2.png)
 
-在搜索中搜素`gs1`，点击搜索结果
+在搜索中搜索`gs1`，点击搜索结果
 ![t3](/.github/img/t3.png)
 
 将红色框住部分删除，将蓝色框选部分更改为你的列表地址，例如`http://127.0.0.1:8080` 之后保存安装即可
