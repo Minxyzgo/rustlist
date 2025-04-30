@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.minxyzgo"
-version = "0.0.1"
+version = "1.1.0"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
