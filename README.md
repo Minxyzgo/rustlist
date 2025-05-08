@@ -75,7 +75,7 @@ staticRoomList:
 可以在配置文件中用`staticRoomList`配置
 
 以下是有用的配置信息:
-
+ - `uuid`房间的uuid，可用于在`api`中更新此房间
  - `creator`房间的创建者
  - `mapName`房间地图
  - `version`版本号
