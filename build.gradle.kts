@@ -9,7 +9,11 @@ group = "io.minxyzgo"
 version = "1.1.0"
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
+    // 使用自定义Application.main而不是EngineMain
+    // 原因：项目有自定义配置加载逻辑(config.yaml)和启动流程
+    // EngineMain需要application.conf而Application.main使用config.yaml
+    // 修改后程序将使用src/main/kotlin/Application.kt中的main函数
+    mainClass = "io.minxyzgo.ApplicationKt"
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
